@@ -65,7 +65,7 @@ sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -
 cd ~
 
 # Cloner votre repository (remplacez par votre URL)
-git clone https://github.com/VOTRE_USERNAME/quiz-master.git
+git clone https://github.com/FAEZ10/quiz-master.git
 
 # Aller dans le dossier
 cd quiz-master

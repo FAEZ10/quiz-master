@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useSocket } from '@/store/useSocket'
@@ -31,6 +32,7 @@ export function ResultsScreen() {
   const { currentRoom, gameState, currentPlayer, playerAnswers, leaveRoom } = useSocket()
   const [showConfetti, setShowConfetti] = useState(false)
   const [showCorrection, setShowCorrection] = useState(false)
+  const router = useRouter()
 
   // Déclencher les confettis pour le top 3
   useEffect(() => {
@@ -56,6 +58,13 @@ export function ResultsScreen() {
 
   const handleLeaveRoom = () => {
     leaveRoom()
+  }
+
+  const handleReplay = () => {
+    // Quitter la salle actuelle et nettoyer l'état
+    leaveRoom()
+    // Rediriger vers la page d'accueil
+    router.push('/')
   }
 
   const handleShare = async () => {
@@ -413,7 +422,7 @@ export function ResultsScreen() {
 
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button
-              onClick={() => window.location.reload()}
+              onClick={handleReplay}
               variant="outline"
               className="flex items-center space-x-2 h-12 px-6"
             >

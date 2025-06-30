@@ -13,17 +13,15 @@ import {
 const app = express()
 const httpServer = createServer(app)
 
-// Configuration CORS
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-domain.com'] 
+    ? ['http://164.90.225.146', 'https://164.90.225.146'] 
     : ['http://localhost:3000'],
   credentials: true
 }))
 
 app.use(express.json())
 
-// Routes de base
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() })
 })
@@ -44,7 +42,6 @@ app.get('/api/categories', (req, res) => {
   res.json(categories)
 })
 
-// Configuration Socket.IO
 const io = new Server<
   ClientToServerEvents,
   ServerToClientEvents,
@@ -53,7 +50,7 @@ const io = new Server<
 >(httpServer, {
   cors: {
     origin: process.env.NODE_ENV === 'production' 
-      ? ['https://your-domain.com'] 
+      ? ['http://164.90.225.146', 'https://164.90.225.146'] 
       : ['http://localhost:3000'],
     methods: ['GET', 'POST'],
     credentials: true
@@ -61,14 +58,11 @@ const io = new Server<
   transports: ['websocket', 'polling']
 })
 
-// Gestionnaire de jeu
 const gameManager = new GameManager(io)
 
-// Gestion des connexions Socket.IO
 io.on('connection', (socket) => {
   console.log(`Client connecté: ${socket.id}`)
 
-  // Création d'une salle
   socket.on('room:create', async (playerName, settings) => {
     try {
       console.log(`${socket.id} crée une salle: ${playerName}`)
@@ -79,7 +73,6 @@ io.on('connection', (socket) => {
     }
   })
 
-  // Rejoindre une salle
   socket.on('room:join', async (code, playerName) => {
     try {
       console.log(`${socket.id} rejoint la salle ${code}: ${playerName}`)
@@ -90,7 +83,6 @@ io.on('connection', (socket) => {
     }
   })
 
-  // Quitter une salle
   socket.on('room:leave', () => {
     try {
       console.log(`${socket.id} quitte sa salle`)
@@ -100,7 +92,6 @@ io.on('connection', (socket) => {
     }
   })
 
-  // Démarrer le jeu
   socket.on('game:start', async () => {
     try {
       console.log(`${socket.id} démarre le jeu`)
@@ -111,7 +102,6 @@ io.on('connection', (socket) => {
     }
   })
 
-  // Répondre à une question
   socket.on('game:answer', (answer) => {
     try {
       console.log(`${socket.id} répond: ${answer}`)
@@ -131,7 +121,6 @@ io.on('connection', (socket) => {
     }
   })
 
-  // Déconnexion
   socket.on('disconnect', (reason) => {
     console.log(`Client déconnecté: ${socket.id}, raison: ${reason}`)
     try {
@@ -141,13 +130,11 @@ io.on('connection', (socket) => {
     }
   })
 
-  // Gestion des erreurs
   socket.on('error', (error) => {
     console.error(`Erreur socket ${socket.id}:`, error)
   })
 })
 
-// Gestion des erreurs du serveur
 process.on('uncaughtException', (error) => {
   console.error('Uncaught Exception:', error)
   process.exit(1)
@@ -158,7 +145,6 @@ process.on('unhandledRejection', (reason, promise) => {
   process.exit(1)
 })
 
-// Démarrage du serveur
 const PORT = process.env.PORT || 8003
 
 httpServer.listen(PORT, () => {
@@ -167,7 +153,6 @@ httpServer.listen(PORT, () => {
   console.log(`🌍 Environnement: ${process.env.NODE_ENV || 'development'}`)
 })
 
-// Graceful shutdown
 process.on('SIGTERM', () => {
   console.log('SIGTERM reçu, arrêt du serveur...')
   httpServer.close(() => {

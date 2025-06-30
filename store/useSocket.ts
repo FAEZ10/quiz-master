@@ -289,7 +289,10 @@ export const useSocket = create<SocketStore>((set, get) => ({
       set({ 
         currentRoom: null, 
         currentPlayer: null, 
-        gameState: null 
+        gameState: null,
+        playerAnswers: {},
+        error: null,
+        isLoading: false
       })
     }
   },
