@@ -86,10 +86,10 @@ export function JoinRoomDialog({ open, onOpenChange }: JoinRoomDialogProps) {
         exit={{ scale: 0.9, opacity: 0, y: 20 }}
         transition={{ type: "spring", duration: 0.5 }}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg"
+        className="w-full max-w-lg max-h-[90vh] overflow-y-auto"
       >
         <Card className="backdrop-blur-xl bg-white/95 border-0 shadow-2xl">
-          <CardHeader className="bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 text-white rounded-t-lg">
+          <CardHeader className="bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 text-white rounded-t-lg sticky top-0 z-10">
             <CardTitle className="flex items-center text-2xl">
               <motion.div
                 animate={{ scale: [1, 1.1, 1] }}
