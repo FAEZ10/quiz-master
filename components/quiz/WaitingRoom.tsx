@@ -97,7 +97,6 @@ export function WaitingRoom() {
     })
     
     if (!success) {
-      // Fallback: copier le lien
       handleCopyLink()
     }
   }
