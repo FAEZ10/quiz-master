@@ -1,7 +1,7 @@
 # 📊 RAPPORT DE PROJET
 ## Quiz Multijoueur en Temps Réel - QuizMaster
 
-**Développé par :** [Votre Nom]  
+**Développé par :** [BACAR ZOUBEIRI FAEZ, SAIDOU IBRAHIM, OMER DOTCHAMOU]  
 **Période :** Juin - Juillet 2025  
 **Technologies :** Next.js, Socket.IO, TypeScript, Tailwind CSS
 
@@ -160,7 +160,6 @@ QuizMaster est une application web de quiz multijoueur en temps réel permettant
 
 ### 4.1 Frontend
 ```typescript
-// Technologies principales
 - Next.js 14 (App Router)
 - TypeScript
 - Tailwind CSS + shadcn/ui
@@ -171,7 +170,6 @@ QuizMaster est une application web de quiz multijoueur en temps réel permettant
 
 ### 4.2 Backend
 ```typescript
-// Technologies serveur
 - Node.js + Express
 - Socket.IO Server
 - TypeScript
@@ -309,10 +307,8 @@ interface Room {
 
 ### 8.1 Sources de Questions
 ```typescript
-// API Principale
 const API_URL = 'https://opentdb.com/api.php'
 
-// Questions de Fallback
 const fallbackQuestions = [
   {
     question: "Quelle est la capitale de la France ?",
@@ -321,7 +317,6 @@ const fallbackQuestions = [
     category: "Géographie",
     difficulty: "easy"
   }
-  // ... 50+ questions intégrées
 ]
 ```
 
@@ -458,9 +453,8 @@ QuizMaster démontre la capacité à créer une application web moderne, perform
 
 ## 🔗 LIENS UTILES
 
-- **Repository GitHub** : [Lien vers le code source]
-- **Application Live** : [URL de l'application déployée]
-- **Documentation API** : [Documentation technique]
+- **Repository GitHub** : [https://github.com/FAEZ10/quiz-master.git]
+- **Application Live** : [http://164.90.225.146`]
 - **Guide de Déploiement** : [Instructions détaillées]
 
 ---

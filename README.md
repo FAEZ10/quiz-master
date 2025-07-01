@@ -70,10 +70,8 @@ NODE_ENV=development
 
 4. **Démarrer le projet**
 ```bash
-# Démarre le client et le serveur simultanément
 npm run dev
 
-# Ou séparément :
 npm run dev:client  # Port 3000
 npm run dev:server  # Port 3001
 ```
@@ -160,7 +158,6 @@ private fallbackQuestions: Question[] = [
     difficulty: "easy",
     timeLimit: 30
   },
-  // Ajoutez vos questions...
 ]
 ```
 

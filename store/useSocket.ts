@@ -105,10 +105,8 @@ export const useSocket = create<SocketStore>((set, get) => ({
       toast.error(error)
     })
 
-    // Game events
     socket.on('game:started', (room: Room) => {
       console.log('Game started:', room)
-      // Créer un GameState initial
       const initialGameState: GameState = {
         currentQuestionIndex: 0,
         timeRemaining: room.settings.timePerQuestion,

@@ -111,7 +111,6 @@ io.on('connection', (socket) => {
     }
   })
 
-  // Marquer comme prêt
   socket.on('player:ready', () => {
     try {
       console.log(`${socket.id} est prêt`)

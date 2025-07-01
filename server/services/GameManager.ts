@@ -19,7 +19,7 @@ type ServerType = Server<ClientToServerEvents, ServerToClientEvents, InterServer
 
 export class GameManager {
   private rooms: Map<string, Room> = new Map()
-  private playerRooms: Map<string, string> = new Map() // socketId -> roomId
+  private playerRooms: Map<string, string> = new Map()
   private questionService: QuestionService
   private gameTimers: Map<string, NodeJS.Timeout> = new Map()
 
@@ -27,7 +27,6 @@ export class GameManager {
     this.questionService = new QuestionService()
   }
 
-  // Générer un code de salle unique
   private generateRoomCode(): string {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
     let code = ''
