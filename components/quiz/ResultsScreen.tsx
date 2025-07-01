@@ -26,6 +26,7 @@ import {
 import { PlayerAvatar } from '@/components/ui/player-avatar'
 import { CorrectionSheet } from './CorrectionSheet'
 import confetti from 'canvas-confetti'
+import toast from 'react-hot-toast'
 import type { PlayerAnswer } from '@/shared/types'
 
 export function ResultsScreen() {
@@ -34,7 +35,6 @@ export function ResultsScreen() {
   const [showCorrection, setShowCorrection] = useState(false)
   const router = useRouter()
 
-  // Déclencher les confettis pour le top 3
   useEffect(() => {
     if (currentRoom && gameState && !showConfetti) {
       const sortedPlayers = [...currentRoom.players].sort(
@@ -61,26 +61,53 @@ export function ResultsScreen() {
   }
 
   const handleReplay = () => {
-    // Quitter la salle actuelle et nettoyer l'état
     leaveRoom()
-    // Rediriger vers la page d'accueil
     router.push('/')
   }
 
   const handleShare = async () => {
-    if (navigator.share && currentRoom) {
+    if (!currentRoom || !currentPlayer) return
+
+    const correctAnswers = Object.values(playerAnswers).filter(answer => answer.isCorrect).length
+    const accuracy = Math.round((correctAnswers / totalQuestions) * 100)
+    
+    const shareText = `🎯 Quiz terminé sur QuizMaster !
+    
+🏆 Position: ${currentPlayerPosition}/${sortedPlayers.length}
+⭐ Score: ${currentPlayerScore} points
+🎯 Précision: ${accuracy}%
+📊 Questions: ${correctAnswers}/${totalQuestions} correctes
+
+Rejoignez-nous pour jouer ! 🎮`
+
+    const shareData = {
+      title: 'QuizMaster - Mes résultats',
+      text: shareText,
+      url: window.location.origin
+    }
+
+    if (navigator.share) {
       try {
-        await navigator.share({
-          title: 'QuizMaster - Résultats',
-          text: `Je viens de terminer un quiz sur QuizMaster ! Salle: ${currentRoom.code}`,
-          url: window.location.href
-        })
+        await navigator.share(shareData)
+        toast.success('Résultats partagés !')
       } catch (error) {
-        console.log('Partage annulé')
+        if (error instanceof Error && error.name !== 'AbortError') {
+          console.error('Erreur de partage:', error)
+          fallbackShare(shareText)
+        }
       }
     } else {
-      // Fallback: copier dans le presse-papiers
-      navigator.clipboard.writeText(window.location.href)
+      fallbackShare(shareText)
+    }
+  }
+
+  const fallbackShare = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      toast.success('Résultats copiés dans le presse-papiers !')
+    } catch (error) {
+      console.error('Erreur copie presse-papiers:', error)
+      toast.error('Impossible de partager les résultats')
     }
   }
 
@@ -109,18 +136,18 @@ export function ResultsScreen() {
 
   const getPodiumHeight = (position: number) => {
     switch (position) {
-      case 0: return 'h-32' // 1er
-      case 1: return 'h-24' // 2ème
-      case 2: return 'h-20' // 3ème
+      case 0: return 'h-32' 
+      case 1: return 'h-24'
+      case 2: return 'h-20'
       default: return 'h-16'
     }
   }
 
   const getPodiumColor = (position: number) => {
     switch (position) {
-      case 0: return 'bg-gradient-to-t from-yellow-400 to-yellow-300' // Or
-      case 1: return 'bg-gradient-to-t from-gray-400 to-gray-300' // Argent
-      case 2: return 'bg-gradient-to-t from-orange-400 to-orange-300' // Bronze
+      case 0: return 'bg-gradient-to-t from-yellow-400 to-yellow-300' 
+      case 1: return 'bg-gradient-to-t from-gray-400 to-gray-300' 
+      case 2: return 'bg-gradient-to-t from-orange-400 to-orange-300'
       default: return 'bg-gradient-to-t from-blue-400 to-blue-300'
     }
   }
@@ -134,7 +161,6 @@ export function ResultsScreen() {
     }
   }
 
-  // Utiliser les vraies données de correction du store
   const getCorrectionData = (): { questions: any[], playerAnswers: PlayerAnswer[] } => {
     if (!currentRoom || !currentPlayer) return { questions: [], playerAnswers: [] }
     

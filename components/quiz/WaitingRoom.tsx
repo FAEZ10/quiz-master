@@ -39,7 +39,6 @@ export function WaitingRoom() {
 
   useEffect(() => {
     if (currentRoom) {
-      // Générer le QR code avec le code de la salle
       const roomUrl = `${window.location.origin}/room/${currentRoom.code}`
       QRCodeLib.toDataURL(roomUrl, {
         width: 256,

@@ -35,7 +35,6 @@ export function GameScreen() {
   const [timeProgress, setTimeProgress] = useState(100)
   const [showCorrection, setShowCorrection] = useState(false)
 
-  // Calculer le pourcentage de temps restant
   useEffect(() => {
     if (gameState?.timeRemaining && gameState.currentQuestion) {
       const totalTime = gameState.currentQuestion.timeLimit || 30
@@ -44,7 +43,6 @@ export function GameScreen() {
     }
   }, [gameState?.timeRemaining, gameState?.currentQuestion])
 
-  // Reset quand nouvelle question
   useEffect(() => {
     if (gameState?.isQuestionActive && !gameState.showResults) {
       setSelectedAnswer(null)
@@ -53,7 +51,6 @@ export function GameScreen() {
     }
   }, [gameState?.currentQuestionIndex])
 
-  // Afficher la correction après que la question se termine
   useEffect(() => {
     if (gameState?.showResults && gameState.correctAnswer && hasAnswered) {
       setShowCorrection(true)
