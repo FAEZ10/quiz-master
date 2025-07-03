@@ -39,6 +39,7 @@ Un projet de quiz multijoueur moderne développé avec Next.js, Socket.IO et Typ
 ### Backend
 - **Node.js** + **Express**
 - **Socket.IO** pour WebSocket temps réel
+- **PostgreSQL** pour la persistance des données
 - **TypeScript** pour la cohérence
 - **Open Trivia Database API** pour les questions
 
@@ -61,19 +62,35 @@ cd quiz-realtime
 npm install
 ```
 
-3. **Variables d'environnement**
-Créer un fichier `.env.local` :
-```env
-NEXT_PUBLIC_SOCKET_URL=http://localhost:3010
-NODE_ENV=development
+3. **Configuration PostgreSQL (Optionnel)**
+Voir le fichier `DATABASE_SETUP.md` pour les instructions détaillées.
+```bash
+# Installation PostgreSQL (exemple macOS)
+brew install postgresql
+brew services start postgresql
+
+# Créer la base de données
+createdb quizmaster
 ```
 
-4. **Démarrer le projet**
+4. **Variables d'environnement**
+Créer un fichier `.env.local` :
+```env
+NEXT_PUBLIC_SOCKET_URL=http://localhost:8003
+NODE_ENV=development
+
+# PostgreSQL (optionnel)
+DATABASE_URL=postgresql://username:password@localhost:5432/quizmaster
+```
+
+5. **Démarrer le projet**
 ```bash
+# Démarre le client et le serveur simultanément
 npm run dev
 
+# Ou séparément :
 npm run dev:client  # Port 3000
-npm run dev:server  # Port 3001
+npm run dev:server  # Port 8003
 ```
 
 ## 🏗️ Architecture du Projet
@@ -215,6 +232,9 @@ NODE_ENV=production
 ### REST API
 - `GET /api/health` - Santé du serveur
 - `GET /api/categories` - Liste des catégories
+- `GET /api/games/history?limit=50` - Historique des parties (PostgreSQL)
+- `GET /api/games/:code` - Détails d'une partie par code (PostgreSQL)
+- `GET /api/stats` - Statistiques globales (live + PostgreSQL)
 
 ## 🤝 Contribution
 

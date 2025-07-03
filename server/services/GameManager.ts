@@ -1,6 +1,7 @@
 import { Server, Socket } from 'socket.io'
 import { v4 as uuidv4 } from 'uuid'
 import { QuestionService } from './QuestionService'
+import { DatabaseService } from './DatabaseService'
 import { 
   Room, 
   Player, 
@@ -21,10 +22,12 @@ export class GameManager {
   private rooms: Map<string, Room> = new Map()
   private playerRooms: Map<string, string> = new Map()
   private questionService: QuestionService
+  private databaseService: DatabaseService
   private gameTimers: Map<string, NodeJS.Timeout> = new Map()
 
   constructor(private io: ServerType) {
     this.questionService = new QuestionService()
+    this.databaseService = new DatabaseService()
   }
 
   private generateRoomCode(): string {
@@ -360,7 +363,7 @@ export class GameManager {
     console.log(`${player.name} a répondu: ${answer} (${isCorrect ? 'correct' : 'incorrect'})`)
   }
 
-  private endGame(roomCode: string): void {
+  private async endGame(roomCode: string): Promise<void> {
     const room = this.rooms.get(roomCode)
     if (!room) return
 
@@ -371,6 +374,13 @@ export class GameManager {
     const finalScores = room.players
       .map(p => ({ playerId: p.id, playerName: p.name, score: p.score }))
       .sort((a, b) => b.score - a.score)
+
+    // Sauvegarder les résultats en base de données
+    try {
+      await this.databaseService.saveGameResult(room, finalScores)
+    } catch (error) {
+      console.error('❌ Erreur lors de la sauvegarde:', error)
+    }
 
     this.io.to(roomCode).emit('room:updated', room)
 

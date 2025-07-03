@@ -3,6 +3,8 @@ import { createServer } from 'http'
 import { Server } from 'socket.io'
 import cors from 'cors'
 import { GameManager } from './services/GameManager'
+import { DatabaseService } from './services/DatabaseService'
+import { initDatabase, closePool } from './database/db'
 import { 
   ClientToServerEvents, 
   ServerToClientEvents, 
@@ -59,6 +61,59 @@ const io = new Server<
 })
 
 const gameManager = new GameManager(io)
+const databaseService = new DatabaseService()
+
+// API Routes pour consulter les données PostgreSQL
+
+// Historique des parties
+app.get('/api/games/history', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit as string) || 50
+    const history = await databaseService.getGameHistory(limit)
+    res.json(history)
+  } catch (error) {
+    console.error('Erreur récupération historique:', error)
+    res.status(500).json({ error: 'Erreur serveur' })
+  }
+})
+
+// Partie par code
+app.get('/api/games/:code', async (req, res) => {
+  try {
+    const { code } = req.params
+    const game = await databaseService.getGameByCode(code.toUpperCase())
+    
+    if (!game) {
+      return res.status(404).json({ error: 'Partie non trouvée' })
+    }
+    
+    res.json(game)
+  } catch (error) {
+    console.error('Erreur récupération partie:', error)
+    res.status(500).json({ error: 'Erreur serveur' })
+  }
+})
+
+// Statistiques globales
+app.get('/api/stats', async (req, res) => {
+  try {
+    const dbStats = await databaseService.getGlobalStats()
+    const liveStats = gameManager.getStats()
+    
+    res.json({
+      database: dbStats,
+      live: liveStats,
+      combined: {
+        totalGamesEver: dbStats.totalGames,
+        currentActiveGames: liveStats.activeGames,
+        currentPlayers: liveStats.totalPlayers
+      }
+    })
+  } catch (error) {
+    console.error('Erreur récupération stats:', error)
+    res.status(500).json({ error: 'Erreur serveur' })
+  }
+})
 
 io.on('connection', (socket) => {
   console.log(`Client connecté: ${socket.id}`)
@@ -146,23 +201,40 @@ process.on('unhandledRejection', (reason, promise) => {
 
 const PORT = process.env.PORT || 8003
 
-httpServer.listen(PORT, () => {
-  console.log(`🚀 Serveur démarré sur le port ${PORT}`)
-  console.log(`📡 Socket.IO prêt pour les connexions`)
-  console.log(`🌍 Environnement: ${process.env.NODE_ENV || 'development'}`)
-})
+// Initialiser la base de données puis démarrer le serveur
+const startServer = async () => {
+  try {
+    // Initialiser PostgreSQL
+    await initDatabase()
+    
+    // Démarrer le serveur HTTP
+    httpServer.listen(PORT, () => {
+      console.log(`🚀 Serveur démarré sur le port ${PORT}`)
+      console.log(`📡 Socket.IO prêt pour les connexions`)
+      console.log(`🌍 Environnement: ${process.env.NODE_ENV || 'development'}`)
+      console.log(`💾 Base de données PostgreSQL connectée`)
+    })
+  } catch (error) {
+    console.error('❌ Erreur lors du démarrage:', error)
+    process.exit(1)
+  }
+}
 
-process.on('SIGTERM', () => {
+startServer()
+
+process.on('SIGTERM', async () => {
   console.log('SIGTERM reçu, arrêt du serveur...')
-  httpServer.close(() => {
+  httpServer.close(async () => {
+    await closePool()
     console.log('Serveur arrêté')
     process.exit(0)
   })
 })
 
-process.on('SIGINT', () => {
+process.on('SIGINT', async () => {
   console.log('SIGINT reçu, arrêt du serveur...')
-  httpServer.close(() => {
+  httpServer.close(async () => {
+    await closePool()
     console.log('Serveur arrêté')
     process.exit(0)
   })
